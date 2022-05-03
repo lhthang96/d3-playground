@@ -6,11 +6,10 @@
   import data from "./assets/data.json";
   import type { RealtimeData } from "./interfaces";
 
-  const margin = { top: 20, right: 20, bottom: 20, left: 20 },
-    width = 600,
-    height = 400,
-    duration = 1000,
-    color = d3.schemeCategory10;
+  const margin = { top: 20, right: 20, bottom: 20, left: 20 };
+  const width = 600;
+  const height = 400;
+  const duration = 1000;
   const dataLength = data.length;
 
   let lineData: RealtimeData[] = [];
@@ -44,6 +43,7 @@
     selection: Selection<HTMLDivElement, RealtimeData[], HTMLDivElement, any>
   ): void => {
     selection.each((data) => {
+      // TODO: Remove unnecessary mapping data
       const newData = [
         {
           label: "x",
@@ -57,61 +57,21 @@
       const y = d3
         .scaleLinear()
         .rangeRound([height - margin.top - margin.bottom, 0]);
-      const z = d3.scaleOrdinal(color);
 
-      const xMin = d3.min(newData, function (c) {
-        return d3.min(c.values, function (d) {
-          return d.time;
-        });
-      });
-      const xMax = new Date(
-        new Date(
-          d3.max(newData, function (c) {
-            return d3.max(c.values, function (d) {
-              return d.time;
-            });
-          })
-        ).getTime() -
-          duration * 2
-      );
+      // TODO: How about cannot receive data in the exact duration
+      const xMin = new Date().getTime() - 30 * 1000 + duration * 2;
+      const xMax = new Date().getTime() - duration * 2;
       x.domain([xMin, xMax]);
+
+      // TODO: Can we dynamic this based on the values with a delta
       y.domain([35, 70]);
-
-      // y.domain([
-      //   d3.min(newData, function (c) {
-      //     return d3.min(c.values, function (d) {
-      //       return d.value;
-      //     });
-      //   }),
-      //   d3.max(newData, function (c) {
-      //     return d3.max(c.values, function (d) {
-      //       return d.value;
-      //     });
-      //   }),
-      // ]);
-
-      // const yMin = d3.min(newData, (item) => item.value);
-      // const yMax = d3.max(newData, (item) => item.value);
-      // y.domain([yMin, yMax]);
-
-      // const line = d3
-      //   .line()
-      //   .curve(d3.curveBasis)
-      //   .x((data) => {
-      //     console.log({ data });
-      //     return x(data[0]);
-      //   })
-      //   .y((data) => y(data[1]));
 
       const line = d3
         .line()
         .curve(d3.curveBasis)
-        .x(function (d: any) {
-          return x(d.time);
-        })
-        .y(function (d: any) {
-          return y(d.value);
-        });
+        // TODO: Fix type as any is just a work around. Confirm if this is type error?
+        .x((d: any) => x(d.time))
+        .y((d: any) => y(d.value));
 
       const svg = d3.select("#chart").selectAll("svg").data([newData]);
       const gEnter = svg.enter().append("svg").append("g");
@@ -138,18 +98,16 @@
       anotherSvg.attr("width", width).attr("height", height);
 
       const tick = () => {
-        const newThis = d3.select("#chart").select("path.data").node();
-        console.log({ newThis });
-        d3.select(newThis)
+        const pathData = d3.select("#chart").select("path.data").node();
+        d3.select(pathData)
           .attr("d", (d) => {
-            console.log({ d });
             return line(d as [number, number][]);
           })
           .attr("transform", null);
 
-        var xMinLess = new Date(new Date(xMin).getTime() - duration);
-        d3.active(newThis)
-          .attr("transform", "translate(" + x(xMinLess) + ",0)")
+        const xMinLess = new Date(xMin).getTime() - duration;
+        d3.active(pathData)
+          .attr("transform", `translate(${x(xMinLess) || 0}, 0)`)
           .transition()
           .on("start", tick);
       };
@@ -177,10 +135,7 @@
 
       g.selectAll("g path.data")
         .data(newData)
-        .style("stroke", () => {
-          console.log({ z });
-          return z("x");
-        })
+        .style("stroke", "steelblue")
         .style("stroke-width", 1)
         .style("fill", "none")
         .transition()
