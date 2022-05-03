@@ -8,7 +8,7 @@ function realTimeLineChart() {
   function chart(selection) {
     // Based on https://bl.ocks.org/mbostock/3884955
     selection.each(function (data) {
-      data = ["x"].map(function (c) {
+      data = ["x", "y", "z"].map(function (c) {
         return {
           label: c,
           values: data.map(function (d) {
@@ -16,7 +16,6 @@ function realTimeLineChart() {
           }),
         };
       });
-      console.log({ data });
 
       var t = d3.transition().duration(duration).ease(d3.easeLinear),
         x = d3.scaleTime().rangeRound([0, width - margin.left - margin.right]),
@@ -54,11 +53,11 @@ function realTimeLineChart() {
           });
         }),
       ]);
-      // z.domain(
-      //   data.map(function (c) {
-      //     return c.label;
-      //   })
-      // );
+      z.domain(
+        data.map(function (c) {
+          return c.label;
+        })
+      );
 
       var line = d3
         .line()
@@ -70,9 +69,7 @@ function realTimeLineChart() {
           return y(d.value);
         });
 
-      console.log({ whatThis: this });
       var svg = d3.select(this).selectAll("svg").data([data]);
-      // console.log({ svg: svg.node() });
       var gEnter = svg.enter().append("svg").append("g");
       gEnter.append("g").attr("class", "axis x");
       gEnter.append("g").attr("class", "axis y");
@@ -93,31 +90,31 @@ function realTimeLineChart() {
         .append("path")
         .attr("class", "data");
 
-      // var legendEnter = gEnter
-      //   .append("g")
-      //   .attr("class", "legend")
-      //   .attr(
-      //     "transform",
-      //     "translate(" + (width - margin.right - margin.left - 75) + ",25)"
-      //   );
-      // legendEnter
-      //   .append("rect")
-      //   .attr("width", 50)
-      //   .attr("height", 75)
-      //   .attr("fill", "#ffffff")
-      //   .attr("fill-opacity", 0.7);
-      // legendEnter
-      //   .selectAll("text")
-      //   .data(data)
-      //   .enter()
-      //   .append("text")
-      //   .attr("y", function (d, i) {
-      //     return i * 20 + 25;
-      //   })
-      //   .attr("x", 5)
-      //   .attr("fill", function (d) {
-      //     return z(d.label);
-      //   });
+      var legendEnter = gEnter
+        .append("g")
+        .attr("class", "legend")
+        .attr(
+          "transform",
+          "translate(" + (width - margin.right - margin.left - 75) + ",25)"
+        );
+      legendEnter
+        .append("rect")
+        .attr("width", 50)
+        .attr("height", 75)
+        .attr("fill", "#ffffff")
+        .attr("fill-opacity", 0.7);
+      legendEnter
+        .selectAll("text")
+        .data(data)
+        .enter()
+        .append("text")
+        .attr("y", function (d, i) {
+          return i * 20 + 25;
+        })
+        .attr("x", 5)
+        .attr("fill", function (d) {
+          return z(d.label);
+        });
 
       var svg = selection.select("svg");
       svg.attr("width", width).attr("height", height);
@@ -154,17 +151,16 @@ function realTimeLineChart() {
         .ease(d3.easeLinear)
         .on("start", tick);
 
-      // g.selectAll("g .legend text")
-      //   .data(data)
-      //   .text(function (d) {
-      //     return (
-      //       d.label.toUpperCase() + ": " + d.values[d.values.length - 1].value
-      //     );
-      //   });
+      g.selectAll("g .legend text")
+        .data(data)
+        .text(function (d) {
+          return (
+            d.label.toUpperCase() + ": " + d.values[d.values.length - 1].value
+          );
+        });
 
       // For transitions https://bl.ocks.org/mbostock/1642874
       function tick() {
-        // console.log({ whatThis: this });
         d3.select(this)
           .attr("d", function (d) {
             return line(d.values);
@@ -179,6 +175,36 @@ function realTimeLineChart() {
       }
     });
   }
+
+  chart.margin = function (_) {
+    if (!arguments.length) return margin;
+    margin = _;
+    return chart;
+  };
+
+  chart.width = function (_) {
+    if (!arguments.length) return width;
+    width = _;
+    return chart;
+  };
+
+  chart.height = function (_) {
+    if (!arguments.length) return height;
+    height = _;
+    return chart;
+  };
+
+  chart.color = function (_) {
+    if (!arguments.length) return color;
+    color = _;
+    return chart;
+  };
+
+  chart.duration = function (_) {
+    if (!arguments.length) return duration;
+    duration = _;
+    return chart;
+  };
 
   return chart;
 }
