@@ -1,9 +1,9 @@
 <script lang="ts">
-  import OriginalRealtimeLineChart from "./components/OriginalRealtimeLineChart.svelte";
+  import SimpleBarChart from "./components/SimpleBarChart.svelte";
 </script>
 
 <main>
-  <OriginalRealtimeLineChart />
+  <SimpleBarChart label="Bar Chart" />
 </main>
 
 <style>
@@ -14,6 +14,8 @@
   @media (min-width: 640px) {
     main {
       max-width: none;
+      display: flex;
+      align-items: center;
     }
   }
 </style>

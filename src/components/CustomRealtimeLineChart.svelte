@@ -21,12 +21,24 @@
   onMount(() => {
     renderSubscription = interval(duration).subscribe({
       next: () => {
-        d3.select("#chart").datum(lineData).call(chart);
+        d3.select("#custom-chart").datum(lineData).call(chart);
       },
     });
 
     dataSubscription = interval(duration).subscribe({
       next: (index) => {
+        if (index % 4 === 1) {
+          lineData.push({
+            time: new Date().getTime(),
+            value: undefined,
+          });
+
+          lineData = lineData.filter(
+            (data) => data.time >= new Date().getTime() - observingTime
+          );
+          return;
+        }
+
         const dataIndex = index % dataLength;
 
         const value = parseInt(data[dataIndex].temperature) || 0;
@@ -84,10 +96,11 @@
         .line<RealtimeData>()
         .curve(d3.curveBasis)
         .x((d) => x(d.time))
-        .y((d) => y(d.value));
+        .y((d) => y(d.value))
+        .defined((d) => d.value !== undefined);
 
       const tick = (): void => {
-        const pathData = d3.select("#chart").select("path.data").node();
+        const pathData = d3.select("#custom-chart").select("path.data").node();
         d3.select(pathData)
           .attr("d", (d: RealtimeData[]) => line(d))
           .attr("transform", null);
@@ -99,7 +112,7 @@
           .on("start", tick);
       };
 
-      const svg = d3.select("#chart").selectAll("svg").data([d3Data]);
+      const svg = d3.select("#custom-chart").selectAll("svg").data([d3Data]);
       const gEnter = svg.enter().append("svg").append("g");
       gEnter.append("g").attr("class", "axis x");
       gEnter.append("g").attr("class", "axis y");
@@ -125,7 +138,7 @@
 
       const g = anotherSvg
         .select("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
       g.select("g.axis.x")
         .attr(
@@ -158,7 +171,7 @@
 </script>
 
 <div class="chart-container">
-  <div id="chart" />
+  <div id="custom-chart" />
 </div>
 
 <style>
@@ -167,7 +180,7 @@
     padding: 16px;
   }
 
-  #chart {
+  #custom-chart {
     width: 600px;
     height: 400px;
   }
