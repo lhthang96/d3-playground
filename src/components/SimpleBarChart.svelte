@@ -54,12 +54,12 @@
     // Axes
     svg
       .append("g")
-      .attr("transform", `translate(${padding.left}, ${padding.top})`)
-      .call(yAxis);
-    svg
-      .append("g")
       .attr("transform", `translate(${padding.left}, ${height})`)
       .call(xAxis);
+    svg
+      .append("g")
+      .attr("transform", `translate(${padding.left}, ${padding.top})`)
+      .call(yAxis);
 
     // Bars
     svg

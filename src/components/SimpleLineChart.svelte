@@ -4,13 +4,9 @@
   import data from "../mockup/data.json";
   import { onMount } from "svelte";
   import type { MockupTemperatureData } from "../interfaces";
-  export let chartId = "simpleBarChart";
-  export let label: string = "Simple Bar Chart";
-  export let configs: {
-    yDelta: number;
-  } = {
-    yDelta: 5,
-  };
+  export let chartId = "simpleLineChart";
+  export let label: string = "Simple Line Chart";
+  export let configs: { yDelta: number } = { yDelta: 5 };
   export let styles: {
     width: number;
     height: number;
@@ -61,12 +57,12 @@
     // Axes
     svg
       .append("g")
-      .attr("transform", `translate(${margin.left}, ${margin.top})`)
-      .call(yAxis);
-    svg
-      .append("g")
       .attr("transform", `translate(${margin.left}, ${height})`)
       .call(xAxis);
+    svg
+      .append("g")
+      .attr("transform", `translate(${margin.left}, ${margin.top})`)
+      .call(yAxis);
 
     // Line
     const line = d3
