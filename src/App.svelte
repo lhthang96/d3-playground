@@ -1,9 +1,9 @@
 <script lang="ts">
-  import SimpleBarChart from "./components/SimpleBarChart.svelte";
+  import SimpleLineChart from "./components/SimpleLineChart.svelte";
 </script>
 
 <main>
-  <SimpleBarChart label="Bar Chart" />
+  <SimpleLineChart label="Line Chart" />
 </main>
 
 <style>
