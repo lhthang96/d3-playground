@@ -83,7 +83,12 @@
 
 <section class="chart-section">
   <h3>{label}</h3>
-  <div class="chart-container">
+  <div
+    class="chart-container"
+    style={`width: ${styles.width + margin.bottom}px; height: ${
+      styles.height + margin.right
+    }px`}
+  >
     <svg id={chartId} />
   </div>
 </section>
@@ -94,6 +99,7 @@
   }
 
   .chart-container {
-    background: rgb(214, 235, 214);
+    background: var(--background-color);
+    box-shadow: inset 0 0 4px 1px rgba(0, 0, 0, 0.2);
   }
 </style>
