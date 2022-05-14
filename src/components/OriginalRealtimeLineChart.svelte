@@ -28,7 +28,6 @@
     dataSubscription = interval(duration).subscribe({
       next: (index) => {
         const dataIndex = index % dataLength;
-
         const value = parseInt(data[dataIndex].temperature) || 0;
         lineData.push({
           time: new Date().getTime(),

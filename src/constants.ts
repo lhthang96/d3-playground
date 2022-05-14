@@ -31,12 +31,14 @@ export const DEFAULT_LINE_CHART_STYLES: LineChartStyles = DEFAULT_CHART_STYLES;
 export const CHART_SELECTOR_ITEMS: ChartSelectorItem[] = [
   {
     id: 'simple-line-chart',
-    thumbnail: 'https://cdn.ablebits.com/_img-blog/line-graph/line-graph-excel.png',
+    thumbnail:
+      'https://firebasestorage.googleapis.com/v0/b/d3-playground-a2874.appspot.com/o/line_chart_min.png?alt=media',
     caption: 'Simple line chart',
   },
   {
     id: 'simple-bar-chart',
-    thumbnail: 'https://www.metabase.com/learn/images/master-the-bar-chart-visualization/bar-chart.png',
+    thumbnail:
+      'https://firebasestorage.googleapis.com/v0/b/d3-playground-a2874.appspot.com/o/bar_chart_min.png?alt=media',
     caption: 'Simple bar chart',
   },
 ];
