@@ -1,42 +1,44 @@
 <script lang="ts">
-  import * as d3 from "d3";
-  import dayjs from "dayjs";
-  import data from "../mockup/data.json";
-  import { onMount } from "svelte";
-  import type { MockupTemperatureData } from "../interfaces";
-  export let chartId = "simpleLineChart";
-  export let label: string = "Simple Line Chart";
-  export let configs: { yDelta: number } = { yDelta: 5 };
-  export let styles: {
-    width: number;
-    height: number;
-  } = {
-    width: 500,
-    height: 300,
-  };
+  import * as d3 from 'd3';
+  import dayjs from 'dayjs';
+  import defaultsDeep from 'lodash.defaultsdeep';
+  import { onMount } from 'svelte';
+  import { DEFAULT_LINE_CHART_STYLES } from '../constants';
+  import type { LineChartStyles, MockupTemperatureData } from '../interfaces';
+  import data from '../mockup/data.json';
 
-  const margin = {
-    top: 40,
-    bottom: 20,
-    left: 50,
-    right: 20,
+  /**
+   * Props
+   */
+  export let chartId = 'simpleLineChart';
+  export let label: string = 'Simple Line Chart';
+  export let configs: { yDelta: number } = { yDelta: 5 };
+  export let styles: LineChartStyles = {};
+
+  /**
+   * Compute
+   */
+  $: chartStyles = defaultsDeep(styles, DEFAULT_LINE_CHART_STYLES) as LineChartStyles;
+  $: padding = chartStyles.containerPadding;
+  $: getContainerStyles = () => {
+    let inlineStyles = '';
+    inlineStyles = inlineStyles
+      .concat(`width: ${chartStyles.width + padding.bottom}px`)
+      .concat(`; height: ${chartStyles.height + padding.right}px`)
+      .concat(`; background: ${chartStyles.backgroundColor}`);
+
+    return inlineStyles;
   };
 
   onMount(() => {
-    const svg = d3
-      .select(`svg#${chartId}`)
-      .attr("width", styles.width)
-      .attr("height", styles.height);
+    const svg = d3.select(`svg#${chartId}`).attr('width', chartStyles.width).attr('height', chartStyles.height);
 
-    const width = styles.width - (margin.left + margin.right);
-    const height = styles.height - (margin.top - margin.bottom);
+    const width = chartStyles.width - (padding.left + padding.right);
+    const height = chartStyles.height - (padding.top - padding.bottom);
 
     const xScale = d3
       .scaleTime()
-      .domain([
-        d3.min(data, (d) => new Date(d.date).getTime()),
-        d3.max(data, (d) => new Date(d.date).getTime()),
-      ])
+      .domain([d3.min(data, (d) => new Date(d.date).getTime()), d3.max(data, (d) => new Date(d.date).getTime())])
       .range([0, width]);
 
     const yScale = d3
@@ -47,22 +49,12 @@
       ])
       .range([height - 40, 0]);
 
-    const xAxis = d3
-      .axisBottom(xScale)
-      .tickFormat((domainValue) =>
-        dayjs(domainValue.toString()).format("MM/YY")
-      );
+    const xAxis = d3.axisBottom(xScale).tickFormat((domainValue) => dayjs(domainValue.toString()).format('MM/YY'));
     const yAxis = d3.axisLeft(yScale);
 
     // Axes
-    svg
-      .append("g")
-      .attr("transform", `translate(${margin.left}, ${height})`)
-      .call(xAxis);
-    svg
-      .append("g")
-      .attr("transform", `translate(${margin.left}, ${margin.top})`)
-      .call(yAxis);
+    svg.append('g').attr('transform', `translate(${padding.left}, ${height})`).call(xAxis);
+    svg.append('g').attr('transform', `translate(${padding.left}, ${padding.top})`).call(yAxis);
 
     // Line
     const line = d3
@@ -71,24 +63,19 @@
       .y((d) => yScale(parseFloat(d.temperature) || 0));
 
     svg
-      .append("path")
+      .append('path')
       .datum(data)
-      .attr("transform", `translate(${margin.left}, ${margin.top})`)
-      .attr("fill", "none")
-      .attr("stroke", "steelblue")
-      .attr("stroke-width", 1)
-      .attr("d", line);
+      .attr('transform', `translate(${padding.left}, ${padding.top})`)
+      .attr('fill', 'none')
+      .attr('stroke', chartStyles.color)
+      .attr('stroke-width', 1)
+      .attr('d', line);
   });
 </script>
 
 <section class="chart-section">
   <h3>{label}</h3>
-  <div
-    class="chart-container"
-    style={`width: ${styles.width + margin.bottom}px; height: ${
-      styles.height + margin.right
-    }px`}
-  >
+  <div class="chart-container" style={getContainerStyles()}>
     <svg id={chartId} />
   </div>
 </section>
@@ -99,7 +86,6 @@
   }
 
   .chart-container {
-    background: var(--background-color);
     box-shadow: inset 0 0 4px 1px rgba(0, 0, 0, 0.2);
   }
 </style>

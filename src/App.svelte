@@ -1,10 +1,12 @@
 <script lang="ts">
-  import SimpleLineChart from "./components/SimpleLineChart.svelte";
+  import SimpleLineChart from './components/SimpleLineChart.svelte';
+  import SimpleBarChart from './components/SimpleBarChart.svelte';
 </script>
 
 <main>
   <div class="content">
-    <SimpleLineChart styles={{ height: 300, width: 500 }} />
+    <SimpleLineChart />
+    <SimpleBarChart />
   </div>
   <div class="menu">
     <div class="menu-item" />
