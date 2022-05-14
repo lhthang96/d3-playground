@@ -41,4 +41,10 @@ export const CHART_SELECTOR_ITEMS: ChartSelectorItem[] = [
       'https://firebasestorage.googleapis.com/v0/b/d3-playground-a2874.appspot.com/o/bar_chart_min.png?alt=media',
     caption: 'Simple bar chart',
   },
+  {
+    id: 'realtime-line-chart',
+    thumbnail:
+      'https://firebasestorage.googleapis.com/v0/b/d3-playground-a2874.appspot.com/o/line_chart_min.png?alt=media',
+    caption: 'Realtime line chart',
+  },
 ];

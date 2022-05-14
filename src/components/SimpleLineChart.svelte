@@ -47,7 +47,7 @@
         d3.min(data, (d) => parseFloat(d.temperature) || 0) - configs.yDelta,
         d3.max(data, (d) => parseFloat(d.temperature) || 0) + configs.yDelta,
       ])
-      .range([height - 40, 0]);
+      .range([height - padding.top, 0]);
 
     const xAxis = d3.axisBottom(xScale).tickFormat((domainValue) => dayjs(domainValue.toString()).format('MM/YY'));
     const yAxis = d3.axisLeft(yScale);

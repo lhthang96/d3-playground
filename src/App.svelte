@@ -4,8 +4,9 @@
   import ChartSelector from './components/common/ChartSelector.svelte';
   import { CHART_SELECTOR_ITEMS } from './constants';
   import type { ChartSelectorItem } from './interfaces';
+  import RealtimeLineChart from './components/RealtimeLineChart.svelte';
 
-  let selectedChartId: string;
+  let selectedChartId: string = null;
 
   const selectChart = (event: CustomEvent<{ chart: ChartSelectorItem }>): void => {
     const { chart } = event.detail || {};
@@ -20,6 +21,9 @@
     {/if}
     {#if selectedChartId === 'simple-bar-chart'}
       <SimpleBarChart />
+    {/if}
+    {#if selectedChartId === 'realtime-line-chart'}
+      <RealtimeLineChart />
     {/if}
   </div>
   <div class="menu">
