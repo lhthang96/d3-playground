@@ -31,3 +31,10 @@ export interface BarChartStyles extends ChartStyles {
 }
 
 export interface LineChartStyles extends ChartStyles {}
+
+export interface ChartSelectorItem {
+  id: string;
+  thumbnail: string;
+  caption: string;
+  title?: string;
+}

@@ -1,4 +1,4 @@
-import type { BarChartStyles, ChartStyles, LineChartStyles } from './interfaces';
+import type { BarChartStyles, ChartSelectorItem, ChartStyles, LineChartStyles } from './interfaces';
 
 export const COLORS = {
   PRIMARY: '#b87131',
@@ -27,3 +27,16 @@ export const DEFAULT_BAR_CHART_STYLES: BarChartStyles = {
 };
 
 export const DEFAULT_LINE_CHART_STYLES: LineChartStyles = DEFAULT_CHART_STYLES;
+
+export const CHART_SELECTOR_ITEMS: ChartSelectorItem[] = [
+  {
+    id: 'simple-line-chart',
+    thumbnail: 'https://cdn.ablebits.com/_img-blog/line-graph/line-graph-excel.png',
+    caption: 'Simple line chart',
+  },
+  {
+    id: 'simple-bar-chart',
+    thumbnail: 'https://www.metabase.com/learn/images/master-the-bar-chart-visualization/bar-chart.png',
+    caption: 'Simple bar chart',
+  },
+];
