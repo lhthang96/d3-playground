@@ -105,6 +105,7 @@
     let yMin: number;
     let yMax: number;
 
+    // Refs: https://bl.ocks.org/mbostock/1642874
     const tick = (): void => {
       const pathDataNode = svg.select('path.lineData').node();
 
