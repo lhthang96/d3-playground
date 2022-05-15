@@ -59,16 +59,20 @@
 
   onMount(() => {
     const { duration, observingTime, yDelta } = configs;
-    const width = chartStyles.width - padding.left;
-    const height = chartStyles.height - (padding.top - padding.bottom);
-    const svg = d3.select(`svg#${chartId}`).attr('width', chartStyles.width).attr('height', chartStyles.height);
+    const { width: svgWidth, height: svgHeight } = chartStyles;
+    const svg = d3.select(`svg#${chartId}`).attr('width', svgWidth).attr('height', svgHeight);
+    const drawWidth = chartStyles.width - (padding.left + padding.right);
+    const drawHeight = chartStyles.height - (padding.top + padding.bottom);
 
     /**
      * Create svg components
      */
 
     // x axis
-    svg.append('g').attr('class', 'xAxis').attr('transform', `translate(${padding.left}, ${height})`);
+    svg
+      .append('g')
+      .attr('class', 'xAxis')
+      .attr('transform', `translate(${padding.left}, ${drawHeight + padding.top})`);
 
     // y axis
     svg.append('g').attr('class', 'yAxis').attr('transform', `translate(${padding.left}, ${padding.top})`);
@@ -84,15 +88,15 @@
       .append('clipPath')
       .attr('id', 'lineClip')
       .append('rect')
-      .attr('width', width)
-      .attr('height', height);
+      .attr('width', drawWidth)
+      .attr('height', drawHeight);
     g.append('g').attr('clip-path', 'url(#lineClip)').append('path').attr('class', 'lineData');
 
     /**
      * Define chart configurations
      */
-    const x = d3.scaleTime().rangeRound([0, width]);
-    const y = d3.scaleLinear().rangeRound([height - padding.top, 0]);
+    const x = d3.scaleTime().rangeRound([0, drawWidth]);
+    const y = d3.scaleLinear().rangeRound([drawHeight, 0]);
     const line = d3
       .line<RealtimeData>()
       .curve(d3.curveBasis)
