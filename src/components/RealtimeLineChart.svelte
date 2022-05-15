@@ -33,7 +33,13 @@
   let renderYAxisSubscription: Subscription;
   let data$: Observable<{ time: number; value: number }> = interval(configs.duration).pipe(
     startWith(0),
-    map((index) => ({ value: parseFloat(data[index % data.length].temperature), time: new Date().getTime() }))
+    map((index) => {
+      // const shouldEmitNewValue = Math.random() > 0.3;
+      // const value = shouldEmitNewValue ? parseFloat(data[index % data.length].temperature) : undefined;
+      const value = parseFloat(data[index % data.length].temperature);
+      const time = new Date().getTime();
+      return { value, time };
+    })
   );
 
   /**
@@ -72,6 +78,8 @@
       .append('g')
       .attr('class', 'lineGroup')
       .attr('transform', `translate(${padding.left}, ${padding.top})`);
+
+    // Refs: https://bl.ocks.org/mbostock/1642989
     g.append('defs')
       .append('clipPath')
       .attr('id', 'lineClip')
@@ -89,7 +97,8 @@
       .line<RealtimeData>()
       .curve(d3.curveBasis)
       .x((d) => x(d.time))
-      .y((d) => y(d.value));
+      .y((d) => y(d.value))
+      .defined((d) => typeof d.value === 'number');
 
     let xMin: number;
     let xMax: number;
@@ -140,7 +149,14 @@
 
         // Line
         lineData.push({ time, value });
-        lineData = lineData.filter(({ time }) => time >= xMin - (duration % 0.05) && time <= xMin + observingTime);
+        /**
+         * Why xMin - duration * 2?
+         *
+         * This is for a smooth transition, this make sure the actual path is longer than the visible path (the path displaying
+         * on the UI, the result of the clip-path attribute we defined above). We can make the path longer and longer by storing
+         * more path data, but 2 more points are good enough.
+         */
+        lineData = lineData.filter(({ time }) => time >= xMin - duration * 2 && time <= xMin + observingTime);
         svg
           .select('path.lineData')
           .datum(lineData)
