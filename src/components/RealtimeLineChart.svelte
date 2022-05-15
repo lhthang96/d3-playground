@@ -1,6 +1,9 @@
 <script lang="ts">
   /**
    * Reference: The Path Transitions tutorial by Mike Bostock on https://bl.ocks.org community
+   * Main article: https://bost.ocks.org/mike/path/
+   *
+   * Implementation articles:
    * Part 1: https://bl.ocks.org/mbostock/1643051
    * Part 2: https://bl.ocks.org/mbostock/1642874
    * Part 3: https://bl.ocks.org/mbostock/1642989
