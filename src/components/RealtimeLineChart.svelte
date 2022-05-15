@@ -1,9 +1,16 @@
 <script lang="ts">
+  /**
+   * Reference: The Path Transitions tutorial by Mike Bostock on https://bl.ocks.org community
+   * Part 1: https://bl.ocks.org/mbostock/1643051
+   * Part 2: https://bl.ocks.org/mbostock/1642874
+   * Part 3: https://bl.ocks.org/mbostock/1642989
+   */
+
   import * as d3 from 'd3';
   import defaultsDeep from 'lodash.defaultsdeep';
   import type { Observable, Subscription } from 'rxjs';
   import { interval, startWith } from 'rxjs';
-  import { map, take } from 'rxjs/operators';
+  import { map } from 'rxjs/operators';
   import { onDestroy, onMount } from 'svelte';
   import { DEFAULT_LINE_CHART_STYLES } from '../constants';
   import type { LineChartStyles, RealtimeData } from '../interfaces';
@@ -16,20 +23,17 @@
   export let label: string = 'Realtime Line Chart';
   export let configs: { yDelta?: number; duration?: number; observingTime?: number } = {
     yDelta: 5,
-    duration: 500,
-    observingTime: 10 * 1000,
+    duration: 1000,
+    observingTime: 30 * 1000,
   };
   export let styles: LineChartStyles = {};
-
-  const TAKE = 30;
 
   let lineData: RealtimeData[] = [];
   let renderXAxisSubscription: Subscription;
   let renderYAxisSubscription: Subscription;
   let data$: Observable<{ time: number; value: number }> = interval(configs.duration).pipe(
     startWith(0),
-    map((index) => ({ value: parseFloat(data[index % data.length].temperature), time: new Date().getTime() })),
-    take(TAKE)
+    map((index) => ({ value: parseFloat(data[index % data.length].temperature), time: new Date().getTime() }))
   );
 
   /**
@@ -49,10 +53,36 @@
 
   onMount(() => {
     const { duration, observingTime, yDelta } = configs;
-    const svg = d3.select(`svg#${chartId}`).attr('width', chartStyles.width).attr('height', chartStyles.height);
-
     const width = chartStyles.width - padding.left;
     const height = chartStyles.height - (padding.top - padding.bottom);
+    const svg = d3.select(`svg#${chartId}`).attr('width', chartStyles.width).attr('height', chartStyles.height);
+
+    /**
+     * Create svg components
+     */
+
+    // x axis
+    svg.append('g').attr('class', 'xAxis').attr('transform', `translate(${padding.left}, ${height})`);
+
+    // y axis
+    svg.append('g').attr('class', 'yAxis').attr('transform', `translate(${padding.left}, ${padding.top})`);
+
+    // Group for drawing line
+    const g = svg
+      .append('g')
+      .attr('class', 'lineGroup')
+      .attr('transform', `translate(${padding.left}, ${padding.top})`);
+    g.append('defs')
+      .append('clipPath')
+      .attr('id', 'lineClip')
+      .append('rect')
+      .attr('width', width)
+      .attr('height', height);
+    g.append('g').attr('clip-path', 'url(#lineClip)').append('path').attr('class', 'lineData');
+
+    /**
+     * Define chart configurations
+     */
     const x = d3.scaleTime().rangeRound([0, width]);
     const y = d3.scaleLinear().rangeRound([height - padding.top, 0]);
     const line = d3
@@ -63,9 +93,24 @@
 
     let xMin: number;
     let xMax: number;
+    let yMin: number;
+    let yMax: number;
+
+    const tick = (): void => {
+      const pathDataNode = svg.select('path.lineData').node();
+
+      // Redraw the line
+      d3.select(pathDataNode).attr('d', line).attr('transform', null);
+
+      // Slide it to the left
+      d3.active(pathDataNode)
+        .attr('transform', `translate(${x(new Date(xMin).getTime() - duration)}, 0)`)
+        .transition()
+        .on('start', tick);
+    };
 
     renderXAxisSubscription = interval(duration)
-      .pipe(startWith(0), take(TAKE))
+      .pipe(startWith(0))
       .subscribe({
         next: (): void => {
           const t = d3.transition().duration(duration).ease(d3.easeLinear);
@@ -73,10 +118,6 @@
           xMin = now - observingTime + duration * 2;
           xMax = now - duration * 2;
           x.domain([xMin, xMax]);
-
-          if (!svg.select('g.xAxis').node()) {
-            svg.append('g').attr('class', 'xAxis').attr('transform', `translate(${padding.left}, ${height})`);
-          }
 
           svg
             .select('g.xAxis')
@@ -88,13 +129,9 @@
     renderYAxisSubscription = data$.subscribe({
       next: ({ time, value }): void => {
         const t = d3.transition().duration(duration).ease(d3.easeLinear);
-        const yMin = d3.min(lineData, (data) => data.value) || 0;
-        const yMax = d3.max(lineData, (data) => data.value) || 0;
-        y.domain([yMin - yDelta, yMax + yDelta]);
-
-        if (!svg.select('g.yAxis').node()) {
-          svg.append('g').attr('class', 'yAxis').attr('transform', `translate(${padding.left}, ${padding.top})`);
-        }
+        yMin = d3.min([yMin, d3.min(lineData, (data) => data.value)]);
+        yMax = d3.max([yMax, d3.max(lineData, (data) => data.value)]);
+        y.domain([yMin ? yMin - yDelta : 0, yMax ? yMax + yDelta : 0]);
 
         svg
           .select('g.yAxis')
@@ -102,21 +139,18 @@
           .call(d3.axisLeft(y).ticks(8) as any);
 
         // Line
-        if (!svg.select('path.lineData').node()) {
-          svg.append('path').attr('class', 'lineData');
-        }
-
         lineData.push({ time, value });
         lineData = lineData.filter(({ time }) => time >= xMin - (duration % 0.05) && time <= xMin + observingTime);
         svg
           .select('path.lineData')
           .datum(lineData)
-          .transition(t)
-          .attr('transform', `translate(${padding.left}, ${padding.top})`)
           .attr('fill', 'none')
           .attr('stroke', chartStyles.color)
           .attr('stroke-width', 1)
-          .attr('d', line);
+          .transition()
+          .duration(duration)
+          .ease(d3.easeLinear)
+          .on('start', tick);
       },
     });
   });
