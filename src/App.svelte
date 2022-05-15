@@ -51,6 +51,7 @@
   div.content {
     flex: 1;
     overflow: hidden auto;
+    padding: 24px 32px;
   }
 
   div.menu {

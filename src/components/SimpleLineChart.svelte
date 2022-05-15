@@ -6,7 +6,7 @@
   import { DEFAULT_LINE_CHART_STYLES } from '../constants';
   import type { LineChartStyles, MockupTemperatureData } from '../interfaces';
   import mockup from '../mockup/data.json';
-  const data = mockup.slice(0, 20);
+  const data = mockup.slice(0, 30);
 
   /**
    * Props
@@ -50,7 +50,10 @@
       ])
       .range([height, 0]);
 
-    const xAxis = d3.axisBottom(xScale).tickFormat((domainValue) => dayjs(domainValue.toString()).format('MM/YY'));
+    const xAxis = d3
+      .axisBottom(xScale)
+      .tickFormat((domainValue) => dayjs(domainValue.toString()).format('DD/MM'))
+      .ticks(5);
     const yAxis = d3.axisLeft(yScale);
 
     // Axes
@@ -85,21 +88,28 @@
      *
      * Refs: https://bl.ocks.org/Qizly/8f6ba236b79d9bb03a80
      */
+    const tooltipWidth = 140;
+    const tooltipHeight = 48;
+    const tooltipX = 12;
+    const tooltipY = -30;
+
     const gOverlay = g.append('g').attr('class', 'gOverlay').attr('display', 'none');
     gOverlay.append('circle').attr('r', 5).attr('fill', 'steelblue');
-    gOverlay
+
+    const gTooltip = gOverlay.append('g').attr('class', 'gTooltip');
+    gTooltip
       .append('rect')
       .attr('class', 'tooltip')
-      .attr('x', 12)
-      .attr('y', -30)
-      .attr('width', 140)
-      .attr('height', 48)
+      .attr('x', tooltipX)
+      .attr('y', tooltipY)
+      .attr('width', tooltipWidth)
+      .attr('height', tooltipHeight)
       .attr('stroke', '#212121')
       .attr('fill', '#fff')
       .attr('rx', 4)
       .attr('ry', 4);
-    gOverlay.append('text').attr('class', 'tooltipDate').attr('font-size', 12).attr('x', 20).attr('y', -12);
-    gOverlay.append('text').attr('class', 'tooltipValue').attr('font-size', 12).attr('x', 20).attr('y', 6);
+    gTooltip.append('text').attr('class', 'tooltipDate').attr('font-size', 12).attr('x', 20).attr('y', -12);
+    gTooltip.append('text').attr('class', 'tooltipValue').attr('font-size', 12).attr('x', 20).attr('y', 6);
 
     // Create a rectangle for moving mouse
     g.append('rect')
@@ -114,25 +124,33 @@
         gOverlay.attr('display', 'none');
       })
       .on('mousemove', (e): void => {
-        const rect = gOverlay.select('rect.overlay').node();
-        const [pointerX, pointerY] = d3.pointer(e, rect);
-        // TODO: Why coordinates of the overlay starting from [62, 110] to [491, 349]
-        const x0 = xScale.invert(pointerX - 62);
+        /**
+         * Get pointer coordinates transformed using the inverse of the screen coordinate transformation matrix.
+         * Refs: https://github.com/d3/d3-selection/blob/v3.0.0/README.md#pointer
+         */
+        const [pointerX] = d3.pointer(e, svg.node());
+        const x0 = xScale.invert(pointerX - padding.left);
         const index = d3.bisector((d: MockupTemperatureData) => d.date).left(data, dayjs(x0).format('YYYY-MM-DD'), 1);
         const d0 = data[index - 1];
         const d1 = data[index];
-        // Select the nearest index to pointer
+        // Pick the nearest index to pointer
         const d =
           new Date(x0).getTime() - new Date(d0.date).getTime() > new Date(d1.date).getTime() - new Date(x0).getTime()
             ? d1
             : d0;
         const value = parseFloat(d?.temperature) || 0;
 
-        const tooltipX = xScale(new Date(d.date).getTime());
-        const tooltipY = yScale(value);
-        gOverlay.attr('transform', `translate(${tooltipX}, ${tooltipY})`);
-        gOverlay.select('text.tooltipDate').text(`Date: ${dayjs(x0).format('DD/MM/YYYY')}`);
-        gOverlay.select('text.tooltipValue').text(`Temperature: ${value}`);
+        const overlayTranslateX = xScale(new Date(d.date).getTime());
+        const overlayTranslateY = yScale(value);
+        gOverlay.attr('transform', `translate(${overlayTranslateX}, ${overlayTranslateY})`);
+
+        // Calculate tooltip rectangle
+        const tooltipTranslateX = width - overlayTranslateX < tooltipWidth ? -(tooltipWidth + tooltipX * 2) : 0;
+        gTooltip.attr('transform', `translate(${tooltipTranslateX}, 0)`);
+
+        // Update tooltip texts
+        gTooltip.select('text.tooltipDate').text(`Date: ${dayjs(x0).format('DD/MM/YYYY')}`);
+        gTooltip.select('text.tooltipValue').text(`Temperature: ${value}`);
       });
   });
 </script>
