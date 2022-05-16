@@ -94,7 +94,7 @@
     const tooltipY = -30;
 
     const gOverlay = g.append('g').attr('class', 'gOverlay').attr('display', 'none');
-    gOverlay.append('circle').attr('r', 5).attr('fill', 'steelblue');
+    gOverlay.append('circle').attr('r', 4).attr('fill', 'steelblue');
 
     const gTooltip = gOverlay.append('g').attr('class', 'gTooltip');
     gTooltip

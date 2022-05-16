@@ -52,6 +52,9 @@
     flex: 1;
     overflow: hidden auto;
     padding: 24px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   div.menu {
