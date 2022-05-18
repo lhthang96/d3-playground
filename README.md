@@ -12,11 +12,13 @@ D3 - Data-Driven Document is a library that can help you bring data to life via 
 
 <img src="https://firebasestorage.googleapis.com/v0/b/d3-playground-a2874.appspot.com/o/simple_line_chart_with_label.png?alt=media" alt="Simple line chart" width="500" height="300" />
 
-3. Simple bar chart
+2. Simple bar chart
 
-<img src="https://firebasestorage.googleapis.com/v0/b/d3-playground-a2874.appspot.com/o/bar_chart_min.png?alt=media" alt="Simple line chart" width="500" height="300" />
+<img src="https://firebasestorage.googleapis.com/v0/b/d3-playground-a2874.appspot.com/o/bar_chart_min.png?alt=media" alt="Simple bar chart" width="500" height="300" />
 
-5. Realtime line chart
+3. Realtime line chart
+
+<img src="https://firebasestorage.googleapis.com/v0/b/d3-playground-a2874.appspot.com/o/realtime_line_chart.gif?alt=media" alt="Realtime line chart" width="500" height="300" />
 
 ## TODO
 
