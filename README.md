@@ -9,13 +9,13 @@ D3 - Data-Driven Document is a library that can help you bring data to life via 
 ## Working with D3
 
 The basic idea is:
-1. Create a SVG element
+1. Create a SVG element.
 2. Use D3 (or DOM) selector for selecting and creating components such as `g`, `path`, `line`, `circle`,...
-3. Use D3 tooling functions:
-  - Scaling functions: `d3.scaleTime`, `d3.scaleLinear`, `d3.scaleBand`,...
-  - Chart generator functions: `d3.line`, `d3.area`, `d3.pie`,...
+3. Use D3 tools:
+  - Scaling: `d3.scaleTime`, `d3.scaleLinear`, `d3.scaleBand`,...
+  - Chart generator: `d3.line`, `d3.area`, `d3.pie`,...
   - Transition: duration, easing functions.
-4. Use `class` or `style` for styling components
+4. Use `class` or `style` for styling components.
 
 ## What have been done
 
