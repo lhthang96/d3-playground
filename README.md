@@ -4,7 +4,7 @@ A place for having fun with D3.
 
 ## What is D3
 
-D3 - Data-Driven Document is a library that can help you bring data to life via browser. It provides a set of tools for visualizing data using (typically) SVG element such as axes, chart generator (line, area, pie,...), scales, transitions,...
+D3 - Data-Driven Document is a library that can help you bring data to life via browser. It provides a set of tools such as chart generator (line, area, pie,...), scaling, axes, transition,... for visualizing data using (typically) SVG element.
 
 ## Working with D3
 
@@ -13,6 +13,7 @@ The basic idea is:
 2. Use D3 (or DOM) selector for selecting and creating components such as `g`, `path`, `line`, `circle`,...
 3. Use D3 tools:
   - Scaling: `d3.scaleTime`, `d3.scaleLinear`, `d3.scaleBand`,...
+  - Axes: `d3.axisLeft`, `d3.axisBottom`, `d3.axisTop`, `d3.axisRight`.
   - Chart generator: `d3.line`, `d3.area`, `d3.pie`,...
   - Transition: duration, easing functions.
 4. Use `class` or `style` for styling components.
